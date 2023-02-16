@@ -560,7 +560,7 @@
 					};
 					D1ED2D0A1AD2CFA600CFC3EB = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = A4YJ9MRZ66;
+						DevelopmentTeam = 2BGPYS4QTA;
 						LastSwiftMigration = 1200;
 					};
 				};
@@ -1041,10 +1041,10 @@
 				CODE_SIGN_ENTITLEMENTS = "Kingfisher-Demo.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
-				DEVELOPMENT_TEAM = A4YJ9MRZ66;
+				DEVELOPMENT_TEAM = 2BGPYS4QTA;
 				INFOPLIST_FILE = "Demo/Kingfisher-Demo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.onevcat.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = test.demo.demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 			};
@@ -1057,10 +1057,10 @@
 				CODE_SIGN_ENTITLEMENTS = "Kingfisher-Demo.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
-				DEVELOPMENT_TEAM = A4YJ9MRZ66;
+				DEVELOPMENT_TEAM = 2BGPYS4QTA;
 				INFOPLIST_FILE = "Demo/Kingfisher-Demo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.onevcat.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = test.demo.demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
