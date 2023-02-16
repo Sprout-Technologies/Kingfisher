@@ -22,7 +22,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#if canImport(UIKit)
+#if os(iOS)
 
 import Messages
 import UIKit
@@ -101,7 +101,7 @@ public extension KingfisherWrapper where Base: MSStickerView {
                     guard issuedIdentifier == self.taskIdentifier else {
                         let reason: KingfisherError.ImageSettingErrorReason
                         do {
-                            let value = try result.get()
+                            _ = try result.get()
                             reason = .notCurrentSourceTask(result: nil, error: nil, source: source)
                         } catch {
                             reason = .notCurrentSourceTask(result: nil, error: error, source: source)
@@ -180,7 +180,7 @@ extension KingfisherManager {
         downloadTaskUpdated: DownloadTaskUpdatedBlock? = nil,
         completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?) -> DownloadTask?
     {
-        var options = options
+        let options = options
 
         let retrievingContext = RetrievingContext(options: options, originalSource: source)
         var retryContext: RetryContext?

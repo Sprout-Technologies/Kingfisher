@@ -53,8 +53,9 @@ import WatchKit
 #endif
 #endif
 
-#if canImport(UIKit)
+#if os(iOS)
 import Messages
+import UIKit
 #endif
 
 /// Wrapper for Kingfisher compatible types. This type provides an extension point for
@@ -99,7 +100,7 @@ extension NSTextAttachment: KingfisherCompatible {}
 extension WKInterfaceImage: KingfisherCompatible {}
 #endif
 
-#if canImport(UIKit)
+#if os(iOS)
 extension MSStickerView: KingfisherCompatible {}
 #endif
 

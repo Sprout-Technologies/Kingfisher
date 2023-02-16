@@ -35,6 +35,8 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/onevcat/Kingfisher.git", :tag => s.version }
   s.source_files  = ["Sources/**/*.swift"]
 
+  s.ios.dependency 'APNGKit', '2.2.1'
+
   s.requires_arc = true
   s.frameworks = "CFNetwork", "Accelerate"
   s.weak_frameworks = "SwiftUI", "Combine"
