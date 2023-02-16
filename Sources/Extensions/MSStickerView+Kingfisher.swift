@@ -39,19 +39,35 @@ let stickerCache = ImageCache(name: "sticker")
 public extension KingfisherWrapper where Base: MSStickerView {
     @discardableResult
     func setSticker(
+        url: URL,
+        options: KingfisherOptionsInfo? = nil,
+        progressBlock: DownloadProgressBlock? = nil,
+        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+    {
+        return setSticker(
+            with: url.convertToSource(),
+            options: options,
+            progressBlock: progressBlock,
+            completionHandler: completionHandler)
+    }
+
+    @discardableResult
+    func setSticker(
         with source: Source?,
-        placeholder: Placeholder? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
         let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
-        return setSticker(with: source, placeholder: placeholder, parsedOptions: options, progressBlock: progressBlock, completionHandler: completionHandler)
+        return setSticker(
+            with: source,
+            parsedOptions: options,
+            progressBlock: progressBlock,
+            completionHandler: completionHandler)
     }
 
     internal func setSticker(
         with source: Source?,
-        placeholder: Placeholder? = nil,
         parsedOptions: KingfisherParsedOptionsInfo,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
