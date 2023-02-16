@@ -53,6 +53,10 @@ import WatchKit
 #endif
 #endif
 
+#if canImport(UIKit)
+import Messages
+#endif
+
 /// Wrapper for Kingfisher compatible types. This type provides an extension point for
 /// convenience methods in Kingfisher.
 public struct KingfisherWrapper<Base> {
@@ -64,43 +68,47 @@ public struct KingfisherWrapper<Base> {
 
 /// Represents an object type that is compatible with Kingfisher. You can use `kf` property to get a
 /// value in the namespace of Kingfisher.
-public protocol KingfisherCompatible: AnyObject { }
+public protocol KingfisherCompatible: AnyObject {}
 
 /// Represents a value type that is compatible with Kingfisher. You can use `kf` property to get a
 /// value in the namespace of Kingfisher.
 public protocol KingfisherCompatibleValue {}
 
-extension KingfisherCompatible {
+public extension KingfisherCompatible {
     /// Gets a namespace holder for Kingfisher compatible types.
-    public var kf: KingfisherWrapper<Self> {
+    var kf: KingfisherWrapper<Self> {
         get { return KingfisherWrapper(self) }
-        set { }
+        set {}
     }
 }
 
-extension KingfisherCompatibleValue {
+public extension KingfisherCompatibleValue {
     /// Gets a namespace holder for Kingfisher compatible types.
-    public var kf: KingfisherWrapper<Self> {
+    var kf: KingfisherWrapper<Self> {
         get { return KingfisherWrapper(self) }
-        set { }
+        set {}
     }
 }
 
-extension KFCrossPlatformImage: KingfisherCompatible { }
+extension KFCrossPlatformImage: KingfisherCompatible {}
 #if !os(watchOS)
-extension KFCrossPlatformImageView: KingfisherCompatible { }
-extension KFCrossPlatformButton: KingfisherCompatible { }
-extension NSTextAttachment: KingfisherCompatible { }
+extension KFCrossPlatformImageView: KingfisherCompatible {}
+extension KFCrossPlatformButton: KingfisherCompatible {}
+extension NSTextAttachment: KingfisherCompatible {}
 #else
-extension WKInterfaceImage: KingfisherCompatible { }
+extension WKInterfaceImage: KingfisherCompatible {}
+#endif
+
+#if canImport(UIKit)
+extension MSStickerView: KingfisherCompatible {}
 #endif
 
 #if os(tvOS) && canImport(TVUIKit)
 @available(tvOS 12.0, *)
-extension TVMonogramView: KingfisherCompatible { }
+extension TVMonogramView: KingfisherCompatible {}
 #endif
 
 #if canImport(CarPlay) && !targetEnvironment(macCatalyst)
 @available(iOS 14.0, *)
-extension CPListItem: KingfisherCompatible { }
+extension CPListItem: KingfisherCompatible {}
 #endif

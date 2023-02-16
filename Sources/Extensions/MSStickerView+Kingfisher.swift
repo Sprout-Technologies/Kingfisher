@@ -37,8 +37,21 @@ public struct RetrieveStickerResult {
 let stickerCache = ImageCache(name: "sticker")
 
 public extension KingfisherWrapper where Base: MSStickerView {
+    @discardableResult
+    func setSticker(
+        with source: Source?,
+        placeholder: Placeholder? = nil,
+        options: KingfisherOptionsInfo? = nil,
+        progressBlock: DownloadProgressBlock? = nil,
+        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+    {
+        let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
+        return setSticker(with: source, placeholder: placeholder, parsedOptions: options, progressBlock: progressBlock, completionHandler: completionHandler)
+    }
+
     internal func setSticker(
         with source: Source?,
+        placeholder: Placeholder? = nil,
         parsedOptions: KingfisherParsedOptionsInfo,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
@@ -71,7 +84,13 @@ public extension KingfisherWrapper where Base: MSStickerView {
             completionHandler: { result in
                 CallbackQueue.mainCurrentOrAsync.execute {
                     guard issuedIdentifier == self.taskIdentifier else {
-                        let reason: KingfisherError.ImageSettingErrorReason = .notCurrentSourceTask(result: nil, error: nil, source: source)
+                        let reason: KingfisherError.ImageSettingErrorReason
+                        do {
+                            let value = try result.get()
+                            reason = .notCurrentSourceTask(result: nil, error: nil, source: source)
+                        } catch {
+                            reason = .notCurrentSourceTask(result: nil, error: error, source: source)
+                        }
                         let error = KingfisherError.imageSettingError(reason: reason)
                         completionHandler?(.failure(error))
                         return
@@ -344,9 +363,11 @@ extension KingfisherManager {
                 return nil
             }
 
-        case .provider(let provider):
+//        case .provider(let provider):
 //            provideImage(provider: provider, options: options, completionHandler: _cacheImage)
-            return .dataProviding
+//            return .dataProviding
+        default:
+            return nil
         }
     }
 
