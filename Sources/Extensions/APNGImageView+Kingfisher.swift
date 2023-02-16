@@ -1,8 +1,10 @@
 //
-//  MSStickerViewView+Kingfisher.swift
+//  APNGImageView+Kingfisher.swift
 //  Kingfisher
 //
-//  Created by adad184 on 23/2/16.
+//  Created by ljc on 2023/2/16.
+//
+//  Copyright (c) 2023 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,54 +26,74 @@
 
 #if os(iOS)
 
-import Messages
+import APNGKit
 import UIKit
 
+private let memoryCache = {
+    let totalMemory = ProcessInfo.processInfo.physicalMemory
+    let costLimit = totalMemory / 4
+    let memoryStorage = MemoryStorage.Backend<APNGImage>(
+        config: .init(totalCostLimit: (costLimit > Int.max) ? Int.max : Int(costLimit))
+    )
+    return memoryStorage
+}()
 
-/// Represents the result of a Kingfisher retrieving image task.
-public struct RetrieveStickerResult {
-    public var diskCacheUrl: URL?
+private let diskCache = {
+    let config = DiskStorage.Config(
+        name: "apng",
+        sizeLimit: 0,
+        directory: nil)
+    return DiskStorage.Backend<Data>(noThrowConfig: config, creatingDirectory: true)
+}()
 
+public struct RetrieveAPNGResult {
+    /// Gets the image object of this result.
+    public let image: APNGImage
+
+    /// Gets the cache source of the image. It indicates from which layer of cache this image is retrieved.
+    /// If the image is just downloaded from network, `.none` will be returned.
+    public let cacheType: CacheType
+
+    /// The `Source` which this result is related to. This indicated where the `image` of `self` is referring.
     public let source: Source
+
+    /// The original `Source` from which the retrieve task begins. It can be different from the `source` property.
+    /// When an alternative source loading happened, the `source` will be the replacing loading target, while the
+    /// `originalSource` will be kept as the initial `source` which issued the image loading process.
+    public let originalSource: Source
+
+    /// Gets the data behind the result.
+    ///
+    /// If this result is from a network downloading (when `cacheType == .none`), calling this returns the downloaded
+    /// data. If the reuslt is from cache, it serializes the image with the given cache serializer in the loading option
+    /// and returns the result.
+    ///
+    /// - Note:
+    /// This can be a time-consuming action, so if you need to use the data for multiple times, it is suggested to hold
+    /// it and prevent keeping calling this too frequently.
+    public let data: () -> Data?
 }
 
-let stickerCache = ImageCache(name: "sticker")
-
-public extension KingfisherWrapper where Base: MSStickerView {
+public extension KingfisherWrapper where Base: APNGImageView {
     @discardableResult
-    func setSticker(
-        url: URL,
+    func setImage(
+        with resource: Resource?,
+        placeholder: Placeholder? = nil,
         options: KingfisherOptionsInfo? = nil,
-        progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
-        return setSticker(
-            with: url.convertToSource(),
-            options: options,
-            progressBlock: progressBlock,
+        return setImage(
+            with: resource?.convertToSource(),
+            placeholder: placeholder,
+            parsedOptions: KingfisherParsedOptionsInfo(options),
             completionHandler: completionHandler)
     }
 
-    @discardableResult
-    func setSticker(
+    internal func setImage(
         with source: Source?,
-        options: KingfisherOptionsInfo? = nil,
-        progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
-        return setSticker(
-            with: source,
-            parsedOptions: options,
-            progressBlock: progressBlock,
-            completionHandler: completionHandler)
-    }
-
-    internal func setSticker(
-        with source: Source?,
+        placeholder: Placeholder? = nil,
         parsedOptions: KingfisherParsedOptionsInfo,
-        progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
         var mutatingSelf = self
         guard let source = source else {
@@ -82,6 +104,8 @@ public extension KingfisherWrapper where Base: MSStickerView {
 
         var options = parsedOptions
 
+        let isEmptyImage = base.image == nil
+
         let issuedIdentifier = Source.Identifier.next()
         mutatingSelf.taskIdentifier = issuedIdentifier
 
@@ -89,24 +113,15 @@ public extension KingfisherWrapper where Base: MSStickerView {
             options.preloadAllAnimationData = true
         }
 
-        if let block = progressBlock {
-            options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
-        }
-
-        let task = KingfisherManager.shared.retrieveSticker(
+        let task = KingfisherManager.shared.retrieveAPNG(
             with: source,
             options: options,
             downloadTaskUpdated: { mutatingSelf.imageTask = $0 },
+            referenceTaskIdentifierChecker: { issuedIdentifier == self.taskIdentifier },
             completionHandler: { result in
                 CallbackQueue.mainCurrentOrAsync.execute {
                     guard issuedIdentifier == self.taskIdentifier else {
-                        let reason: KingfisherError.ImageSettingErrorReason
-                        do {
-                            _ = try result.get()
-                            reason = .notCurrentSourceTask(result: nil, error: nil, source: source)
-                        } catch {
-                            reason = .notCurrentSourceTask(result: nil, error: error, source: source)
-                        }
+                        let reason: KingfisherError.ImageSettingErrorReason = .notCurrentSourceTask(result: nil, error: nil, source: source)
                         let error = KingfisherError.imageSettingError(reason: reason)
                         completionHandler?(.failure(error))
                         return
@@ -117,14 +132,10 @@ public extension KingfisherWrapper where Base: MSStickerView {
 
                     switch result {
                     case .success(let value):
-
-                        if let url = value.diskCacheUrl {
-                            self.base.sticker = try? MSSticker(contentsOfFileURL: url, localizedDescription: "")
-                        }
+                        self.base.image = value.image
                         completionHandler?(result)
 
                     case .failure:
-                        self.base.sticker = nil
                         completionHandler?(result)
                     }
                 }
@@ -150,7 +161,7 @@ private var indicatorTypeKey: Void?
 private var placeholderKey: Void?
 private var imageTaskKey: Void?
 
-public extension KingfisherWrapper where Base: MSStickerView {
+public extension KingfisherWrapper where Base: APNGImageView {
     // MARK: Properties
 
     private(set) var taskIdentifier: Source.Identifier.Value? {
@@ -170,18 +181,32 @@ public extension KingfisherWrapper where Base: MSStickerView {
     }
 }
 
-extension MSStickerView {
+extension APNGImageView {
     @objc func shouldPreloadAllAnimation() -> Bool { return true }
 }
 
+extension APNGImage: CacheCostCalculable {
+    /// Cost of an image
+    public var cacheCost: Int {
+        let pixel = Int(size.width * size.height * scale * scale)
+        return pixel * 4 * numberOfFrames
+    }
+}
+
 extension KingfisherManager {
-    func retrieveSticker(
+    func retrieveAPNG(
         with source: Source,
         options: KingfisherParsedOptionsInfo,
         downloadTaskUpdated: DownloadTaskUpdatedBlock? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?) -> DownloadTask?
+        referenceTaskIdentifierChecker: (() -> Bool)? = nil,
+        completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)?) -> DownloadTask?
     {
-        let options = options
+        var options = options
+        if let checker = referenceTaskIdentifierChecker {
+            options.onDataReceived?.forEach {
+                $0.onShouldApply = checker
+            }
+        }
 
         let retrievingContext = RetrievingContext(options: options, originalSource: source)
         var retryContext: RetryContext?
@@ -190,7 +215,7 @@ extension KingfisherManager {
             with source: Source,
             downloadTaskUpdated: DownloadTaskUpdatedBlock?)
         {
-            let newTask = retrieveSticker(with: source, context: retrievingContext) { result in
+            let newTask = retrieveAPNG(with: source, context: retrievingContext) { result in
                 handler(currentSource: source, result: result)
             }
             downloadTaskUpdated?(newTask)
@@ -230,7 +255,7 @@ extension KingfisherManager {
             }
         }
 
-        func handler(currentSource: Source, result: Result<RetrieveStickerResult, KingfisherError>) {
+        func handler(currentSource: Source, result: Result<RetrieveAPNGResult, KingfisherError>) {
             switch result {
             case .success:
                 completionHandler?(result)
@@ -254,7 +279,7 @@ extension KingfisherManager {
             }
         }
 
-        return retrieveSticker(
+        return retrieveAPNG(
             with: source,
             context: retrievingContext)
         {
@@ -263,20 +288,20 @@ extension KingfisherManager {
         }
     }
 
-    private func retrieveSticker(
+    private func retrieveAPNG(
         with source: Source,
         context: RetrievingContext,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?) -> DownloadTask?
+        completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)?) -> DownloadTask?
     {
         let options = context.options
         if options.forceRefresh {
-            return loadAndCacheSticker(
+            return loadAndCacheAPNG(
                 source: source,
                 context: context,
                 completionHandler: completionHandler)?.value
 
         } else {
-            let loadedFromCache = retrieveStickerFromCache(
+            let loadedFromCache = retrieveAPNGFromCache(
                 source: source,
                 context: context,
                 completionHandler: completionHandler)
@@ -285,42 +310,49 @@ extension KingfisherManager {
                 return nil
             }
 
-            return loadAndCacheSticker(
+            if options.onlyFromCache {
+                let error = KingfisherError.cacheError(reason: .imageNotExisting(key: source.cacheKey))
+                completionHandler?(.failure(error))
+                return nil
+            }
+
+            return loadAndCacheAPNG(
                 source: source,
                 context: context,
                 completionHandler: completionHandler)?.value
         }
     }
 
-    private func cacheSticker(
+    private func cacheAPNG(
         source: Source,
         options: KingfisherParsedOptionsInfo,
         context: RetrievingContext,
         result: Result<ImageLoadingResult, KingfisherError>,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?)
+        completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)?)
     {
         switch result {
         case .success(let value):
             let coordinator = CacheCallbackCoordinator(
                 shouldWaitForCache: options.waitForCache, shouldCacheOriginal: false)
-            var result = RetrieveStickerResult(
-                diskCacheUrl: nil,
-                source: source)
 
-            // Add image to cache.
-            let targetCache = stickerCache
-            targetCache.diskStorage.config.autoExtAfterHashedFileName = true
+            guard let apng = try? APNGImage(data: value.originalData) else {
+                completionHandler?(.failure(KingfisherError.cacheError(reason: KingfisherError.CacheErrorReason.cannotConvertToAPNG(url: value.url))))
+                return
+            }
 
-            do {
-                try targetCache.diskStorage.store(value: value.originalData, forKey: source.cacheKey)
+            let result = RetrieveAPNGResult(
+                image: apng,
+                cacheType: .none,
+                source: source,
+                originalSource: context.originalSource,
+                data: { value.originalData })
 
-                result.diskCacheUrl = targetCache.diskStorage.cacheFileURL(forKey: source.cacheKey)
+            memoryCache.store(value: apng, forKey: source.cacheKey)
 
-                coordinator.apply(.cachingImage) {
-                    completionHandler?(.success(result))
-                }
-            } catch {
-                completionHandler?(.failure(KingfisherError.cacheError(reason: .diskStorageIsNotReady(cacheURL: source.url!))))
+            try? diskCache.store(value: value.originalData, forKey: source.cacheKey)
+
+            coordinator.apply(.cachingImage) {
+                completionHandler?(.success(result))
             }
 
             coordinator.apply(.cacheInitiated) {
@@ -333,14 +365,14 @@ extension KingfisherManager {
     }
 
     @discardableResult
-    func loadAndCacheSticker(
+    func loadAndCacheAPNG(
         source: Source,
         context: RetrievingContext,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?) -> DownloadTask.WrappedTask?
+        completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)?) -> DownloadTask.WrappedTask?
     {
         let options = context.options
-        func _cacheSticker(_ result: Result<ImageLoadingResult, KingfisherError>) {
-            cacheSticker(
+        func _cacheAPNG(_ result: Result<ImageLoadingResult, KingfisherError>) {
+            cacheAPNG(
                 source: source,
                 options: options,
                 context: context,
@@ -352,7 +384,7 @@ extension KingfisherManager {
         case .network(let resource):
             let downloader = options.downloader ?? self.downloader
             let task = downloader.downloadImage(
-                with: resource.downloadURL, options: options, completionHandler: _cacheSticker)
+                with: resource.downloadURL, options: options, completionHandler: _cacheAPNG)
 
             // The code below is neat, but it fails the Swift 5.2 compiler with a runtime crash when
             // `BUILD_LIBRARY_FOR_DISTRIBUTION` is turned on. I believe it is a bug in the compiler.
@@ -376,26 +408,40 @@ extension KingfisherManager {
         }
     }
 
-    func retrieveStickerFromCache(
+    func retrieveAPNGFromCache(
         source: Source,
         context: RetrievingContext,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?) -> Bool
+        completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)?) -> Bool
     {
         let key = source.cacheKey
 
-        let url = stickerCache.diskStorage.cacheFileURL(forKey: key)
+        if let image = memoryCache.value(forKey: key) {
+            let result = RetrieveAPNGResult(
+                image: image,
+                cacheType: .memory,
+                source: source,
+                originalSource: context.originalSource,
+                data: { nil })
 
-        if FileManager.default.fileExists(atPath: url.path) {
-            let value = RetrieveStickerResult(
-                diskCacheUrl: url,
-                source: source)
-
-            completionHandler?(.success(value))
-
+            completionHandler?(.success(result))
             return true
-        } else {
-            return false
         }
+
+        if let data = try? diskCache.value(forKey: key),
+           let image = try? APNGImage(data: data)
+        {
+            let result = RetrieveAPNGResult(
+                image: image,
+                cacheType: .disk,
+                source: source,
+                originalSource: context.originalSource,
+                data: { nil })
+
+            completionHandler?(.success(result))
+            return true
+        }
+
+        return false
     }
 }
 

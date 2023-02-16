@@ -3,12 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		07292245263B02F00089E810 /* KFAnimatedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07292244263B02F00089E810 /* KFAnimatedImage.swift */; };
+		22294ADE299E72540094C08A /* APNGImageView+Kingfisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22294ADD299E72540094C08A /* APNGImageView+Kingfisher.swift */; };
 		227F93E8299E1CC5007DF519 /* MSStickerView+Kingfisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227F93E7299E1CC5007DF519 /* MSStickerView+Kingfisher.swift */; };
+		22BE4228299E7CEA008E884F /* APNGKit in Frameworks */ = {isa = PBXBuildFile; productRef = 22BE4227299E7CEA008E884F /* APNGKit */; };
 		22FDCE0E2700078B0044D11E /* CPListItem+Kingfisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22FDCE0D2700078B0044D11E /* CPListItem+Kingfisher.swift */; };
 		4B10480D216F157000300C61 /* ImageDataProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B10480C216F157000300C61 /* ImageDataProcessor.swift */; };
 		4B46CC5F217449C600D90C4A /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B46CC5E217449C600D90C4A /* MemoryStorage.swift */; };
@@ -135,11 +137,11 @@
 /* Begin PBXFileReference section */
 		07292244263B02F00089E810 /* KFAnimatedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KFAnimatedImage.swift; sourceTree = "<group>"; };
 		185218B51CC07F8300BD58DE /* NSButtonExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSButtonExtensionTests.swift; sourceTree = "<group>"; };
+		22294ADD299E72540094C08A /* APNGImageView+Kingfisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "APNGImageView+Kingfisher.swift"; sourceTree = "<group>"; };
 		227F93E7299E1CC5007DF519 /* MSStickerView+Kingfisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MSStickerView+Kingfisher.swift"; sourceTree = "<group>"; };
 		22FDCE0D2700078B0044D11E /* CPListItem+Kingfisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CPListItem+Kingfisher.swift"; sourceTree = "<group>"; };
 		4B10480C216F157000300C61 /* ImageDataProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDataProcessor.swift; sourceTree = "<group>"; };
 		4B164ACE1B8D554200768EC6 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		4B3E714D1B01FEB200F5AAED /* WatchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchKit.framework; path = System/Library/Frameworks/WatchKit.framework; sourceTree = SDKROOT; };
 		4B46CC5E217449C600D90C4A /* MemoryStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryStorage.swift; sourceTree = "<group>"; };
 		4B46CC63217449E000D90C4A /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		4B46CC6821744AC500D90C4A /* DiskStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskStorage.swift; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22BE4228299E7CEA008E884F /* APNGKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +386,7 @@
 				DCEB2841257E4BE100D7A610 /* TVMonogramView+Kingfisher.swift */,
 				22FDCE0D2700078B0044D11E /* CPListItem+Kingfisher.swift */,
 				227F93E7299E1CC5007DF519 /* MSStickerView+Kingfisher.swift */,
+				22294ADD299E72540094C08A /* APNGImageView+Kingfisher.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -681,7 +685,6 @@
 			children = (
 				C959EEE7228940FE00467A10 /* QuartzCore.framework */,
 				4B164ACE1B8D554200768EC6 /* CFNetwork.framework */,
-				4B3E714D1B01FEB200F5AAED /* WatchKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -712,6 +715,9 @@
 			dependencies = (
 			);
 			name = Kingfisher;
+			packageProductDependencies = (
+				22BE4227299E7CEA008E884F /* APNGKit */,
+			);
 			productName = Kingfisher;
 			productReference = D1ED2D351AD2D09F00CFC3EB /* Kingfisher.framework */;
 			productType = "com.apple.product-type.framework";
@@ -764,6 +770,9 @@
 				Base,
 			);
 			mainGroup = D1ED2D021AD2CFA600CFC3EB;
+			packageReferences = (
+				22BE4226299E7CEA008E884F /* XCRemoteSwiftPackageReference "APNGKit" */,
+			);
 			productRefGroup = D1ED2D0C1AD2CFA600CFC3EB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -811,6 +820,7 @@
 				D12AB6DC215D2BB50013BA68 /* ImageProcessor.swift in Sources */,
 				D12AB6D4215D2BB50013BA68 /* Image.swift in Sources */,
 				D1AEB09425890DE7008556DF /* ImageBinder.swift in Sources */,
+				22294ADE299E72540094C08A /* APNGImageView+Kingfisher.swift in Sources */,
 				D12AB728215D2BB50013BA68 /* String+MD5.swift in Sources */,
 				4B8E2917216F3F7F0095FAD1 /* ImageDownloaderDelegate.swift in Sources */,
 				D1132C9725919F69003E528D /* KFOptionsSetter.swift in Sources */,
@@ -1031,8 +1041,9 @@
 				PRODUCT_BUNDLE_PACKAGE_TYPE = BNDL;
 				SDKROOT = "";
 				SUPPORTED_PLATFORMS = "watchsimulator iphonesimulator appletvsimulator watchos appletvos iphoneos macosx";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				TVOS_DEPLOYMENT_TARGET = 12.0;
@@ -1077,7 +1088,11 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				INFOPLIST_FILE = Sources/Info.plist;
 				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_SWIFT_FLAGS = "-Xfrontend -warn-long-expression-type-checking=150";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.onevcat.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_BUNDLE_PACKAGE_TYPE = FMWK;
@@ -1126,13 +1141,18 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				INFOPLIST_FILE = Sources/Info.plist;
 				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.onevcat.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_BUNDLE_PACKAGE_TYPE = FMWK;
 				PRODUCT_NAME = Kingfisher;
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -1147,7 +1167,13 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Tests/KingfisherTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.onevcat.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
@@ -1163,12 +1189,19 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				INFOPLIST_FILE = Tests/KingfisherTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.onevcat.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OBJC_BRIDGING_HEADER = "Tests/KingfisherTests/KingfisherTests-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Release;
@@ -1204,6 +1237,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		22BE4226299E7CEA008E884F /* XCRemoteSwiftPackageReference "APNGKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/APNGKit";
+			requirement = {
+				kind = exactVersion;
+				version = 2.2.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		22BE4227299E7CEA008E884F /* APNGKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22BE4226299E7CEA008E884F /* XCRemoteSwiftPackageReference "APNGKit" */;
+			productName = APNGKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D1ED2D031AD2CFA600CFC3EB /* Project object */;
 }

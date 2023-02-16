@@ -3,13 +3,17 @@ import PackageDescription
 
 let package = Package(
     name: "Kingfisher",
-    platforms: [.iOS(.v12), .macOS(.v10_14), .tvOS(.v12), .watchOS(.v5)],
+    platforms: [.iOS(.v12)],
     products: [
         .library(name: "Kingfisher", targets: ["Kingfisher"])
+    ],
+    dependencies: [
+        .package(url: "https://github.com/onevcat/APNGKit.git", from: "2.2.1")
     ],
     targets: [
         .target(
             name: "Kingfisher",
+            dependencies: ["APNGKit"],
             path: "Sources"
         )
     ]

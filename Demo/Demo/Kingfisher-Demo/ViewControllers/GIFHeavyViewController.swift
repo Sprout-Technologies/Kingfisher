@@ -24,6 +24,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+import APNGKit
 import Kingfisher
 import Messages
 import UIKit
@@ -35,6 +36,7 @@ class GIFHeavyViewController: UIViewController {
 //    let imageView_3 = AnimatedImageView()
 //    let imageView_4 = AnimatedImageView()
     let stickerView = MSStickerView()
+    let apngView = APNGImageView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,31 +81,48 @@ class GIFHeavyViewController: UIViewController {
 //        imageView_3.kf.setImage(with: url)
 //        imageView_4.kf.setImage(with: url)
         
-        let url = URL(string: "https://sprout-stickers.oss-cn-hongkong.aliyuncs.com/01D35398-EAC2-42BD-8EC1-2F067EAD2083.gif")!
+        // sticker
+//        let url = URL(string: "https://sprout-stickers.oss-cn-hongkong.aliyuncs.com/01D35398-EAC2-42BD-8EC1-2F067EAD2083.gif")!
+//
+//        stickerView.translatesAutoresizingMaskIntoConstraints = false
+//        view.addSubview(stickerView)
+//        stickerView.backgroundColor = UIColor.gray
+//
+//        NSLayoutConstraint.activate([
+//            stickerView.widthAnchor.constraint(equalToConstant: 300),
+//            stickerView.heightAnchor.constraint(equalToConstant: 300),
+//            stickerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            stickerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+//        ])
+//
+//        stickerView.kf.setSticker(url: url, completionHandler: { result in
+//
+//            switch result {
+//            case .success(let value):
+//                do {
+//                    if let url = value.diskCacheUrl {
+//                        self.stickerView.sticker = try MSSticker(contentsOfFileURL: url, localizedDescription: url.lastPathComponent)
+//                    }
+//                } catch {}
+//            case .failure(let error):
+//                debugPrint("\(error)")
+//            }
+//        })
         
-        stickerView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stickerView)
-        stickerView.backgroundColor = UIColor.gray
+        // apng
+        let url = URL(string: "https://sprout-stickers.oss-accelerate.aliyuncs.com/9DDA8A44-81CE-4A1B-B8B3-840139C12C2E.png")!
+        
+        apngView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(apngView)
+        apngView.backgroundColor = UIColor.gray
         
         NSLayoutConstraint.activate([
-            stickerView.widthAnchor.constraint(equalToConstant: 300),
-            stickerView.heightAnchor.constraint(equalToConstant: 300),
-            stickerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stickerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            apngView.widthAnchor.constraint(equalToConstant: 300),
+            apngView.heightAnchor.constraint(equalToConstant: 300),
+            apngView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            apngView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
         
-        stickerView.kf.setSticker(url: url, completionHandler: { result in
-
-            switch result {
-            case .success(let value):
-                do {
-                    if let url = value.diskCacheUrl {
-                        self.stickerView.sticker = try MSSticker(contentsOfFileURL: url, localizedDescription: url.lastPathComponent)
-                    }
-                } catch {}
-            case .failure(let error):
-                debugPrint("\(error)")
-            }
-        })
+        apngView.kf.setImage(with: url)
     }
 }

@@ -54,6 +54,7 @@ import WatchKit
 #endif
 
 #if os(iOS)
+import APNGKit
 import Messages
 import UIKit
 #endif
@@ -102,6 +103,8 @@ extension WKInterfaceImage: KingfisherCompatible {}
 
 #if os(iOS)
 extension MSStickerView: KingfisherCompatible {}
+extension APNGImageView: KingfisherCompatible {}
+extension APNGImage: KingfisherCompatible {}
 #endif
 
 #if os(tvOS) && canImport(TVUIKit)
