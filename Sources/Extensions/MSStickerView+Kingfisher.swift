@@ -1,5 +1,5 @@
 //
-//  ImageView+Kingfisher.swift
+//  MSStickerViewView+Kingfisher.swift
 //  Kingfisher
 //
 //  Created by adad184 on 23/2/16.
@@ -37,207 +37,8 @@ public struct RetrieveStickerResult {
 let stickerCache = ImageCache(name: "sticker")
 
 public extension KingfisherWrapper where Base: MSStickerView {
-    @discardableResult
-    func setSticker(
-        with source: Source?,
-        placeholder: Placeholder? = nil,
-        options: KingfisherOptionsInfo? = nil,
-        progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
-        return setSticker(with: source, placeholder: placeholder, parsedOptions: options, progressBlock: progressBlock, completionHandler: completionHandler)
-    }
-
-    /// Sets an image to the image view with a `Source`.
-    ///
-    /// - Parameters:
-    ///   - source: The `Source` object defines data information from network or a data provider.
-    ///   - placeholder: A placeholder to show while retrieving the image from the given `resource`.
-    ///   - options: An options set to define image setting behaviors. See `KingfisherOptionsInfo` for more.
-    ///   - completionHandler: Called when the image retrieved and set finished.
-    /// - Returns: A task represents the image downloading.
-    ///
-    /// - Note:
-    /// This is the easiest way to use Kingfisher to boost the image setting process from a source. Since all parameters
-    /// have a default value except the `source`, you can set an image from a certain URL to an image view like this:
-    ///
-    /// ```
-    /// // Set image from a network source.
-    /// let url = URL(string: "https://example.com/image.png")!
-    /// imageView.kf.setImage(with: .network(url))
-    ///
-    /// // Or set image from a data provider.
-    /// let provider = LocalFileImageDataProvider(fileURL: fileURL)
-    /// imageView.kf.setImage(with: .provider(provider))
-    /// ```
-    ///
-    /// For both `.network` and `.provider` source, there are corresponding view extension methods. So the code
-    /// above is equivalent to:
-    ///
-    /// ```
-    /// imageView.kf.setImage(with: url)
-    /// imageView.kf.setImage(with: provider)
-    /// ```
-    ///
-    /// Internally, this method will use `KingfisherManager` to get the source.
-    /// Since this method will perform UI changes, you must call it from the main thread.
-    /// The `completionHandler` will be also executed in the main thread.
-    ///
-    @discardableResult
-    func setSticker(
-        with source: Source?,
-        placeholder: Placeholder? = nil,
-        options: KingfisherOptionsInfo? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        return setSticker(
-            with: source,
-            placeholder: placeholder,
-            options: options,
-            progressBlock: nil,
-            completionHandler: completionHandler)
-    }
-
-    /// Sets an image to the image view with a requested resource.
-    ///
-    /// - Parameters:
-    ///   - resource: The `Resource` object contains information about the resource.
-    ///   - placeholder: A placeholder to show while retrieving the image from the given `resource`.
-    ///   - options: An options set to define image setting behaviors. See `KingfisherOptionsInfo` for more.
-    ///   - progressBlock: Called when the image downloading progress gets updated. If the response does not contain an
-    ///                    `expectedContentLength`, this block will not be called.
-    ///   - completionHandler: Called when the image retrieved and set finished.
-    /// - Returns: A task represents the image downloading.
-    ///
-    /// - Note:
-    /// This is the easiest way to use Kingfisher to boost the image setting process from network. Since all parameters
-    /// have a default value except the `resource`, you can set an image from a certain URL to an image view like this:
-    ///
-    /// ```
-    /// let url = URL(string: "https://example.com/image.png")!
-    /// imageView.kf.setImage(with: url)
-    /// ```
-    ///
-    /// Internally, this method will use `KingfisherManager` to get the requested resource, from either cache
-    /// or network. Since this method will perform UI changes, you must call it from the main thread.
-    /// Both `progressBlock` and `completionHandler` will be also executed in the main thread.
-    ///
-    @discardableResult
-    func setSticker(
-        with resource: Resource?,
-        placeholder: Placeholder? = nil,
-        options: KingfisherOptionsInfo? = nil,
-        progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        return setSticker(
-            with: resource?.convertToSource(),
-            placeholder: placeholder,
-            options: options,
-            progressBlock: progressBlock,
-            completionHandler: completionHandler)
-    }
-
-    /// Sets an image to the image view with a requested resource.
-    ///
-    /// - Parameters:
-    ///   - resource: The `Resource` object contains information about the resource.
-    ///   - placeholder: A placeholder to show while retrieving the image from the given `resource`.
-    ///   - options: An options set to define image setting behaviors. See `KingfisherOptionsInfo` for more.
-    ///   - completionHandler: Called when the image retrieved and set finished.
-    /// - Returns: A task represents the image downloading.
-    ///
-    /// - Note:
-    /// This is the easiest way to use Kingfisher to boost the image setting process from network. Since all parameters
-    /// have a default value except the `resource`, you can set an image from a certain URL to an image view like this:
-    ///
-    /// ```
-    /// let url = URL(string: "https://example.com/image.png")!
-    /// imageView.kf.setImage(with: url)
-    /// ```
-    ///
-    /// Internally, this method will use `KingfisherManager` to get the requested resource, from either cache
-    /// or network. Since this method will perform UI changes, you must call it from the main thread.
-    /// The `completionHandler` will be also executed in the main thread.
-    ///
-    @discardableResult
-    func setSticker(
-        with resource: Resource?,
-        placeholder: Placeholder? = nil,
-        options: KingfisherOptionsInfo? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        return setSticker(
-            with: resource,
-            placeholder: placeholder,
-            options: options,
-            progressBlock: nil,
-            completionHandler: completionHandler)
-    }
-
-    /// Sets an image to the image view with a data provider.
-    ///
-    /// - Parameters:
-    ///   - provider: The `ImageDataProvider` object contains information about the data.
-    ///   - placeholder: A placeholder to show while retrieving the image from the given `resource`.
-    ///   - options: An options set to define image setting behaviors. See `KingfisherOptionsInfo` for more.
-    ///   - progressBlock: Called when the image downloading progress gets updated. If the response does not contain an
-    ///                    `expectedContentLength`, this block will not be called.
-    ///   - completionHandler: Called when the image retrieved and set finished.
-    /// - Returns: A task represents the image downloading.
-    ///
-    /// Internally, this method will use `KingfisherManager` to get the image data, from either cache
-    /// or the data provider. Since this method will perform UI changes, you must call it from the main thread.
-    /// Both `progressBlock` and `completionHandler` will be also executed in the main thread.
-    ///
-    @discardableResult
-    func setSticker(
-        with provider: ImageDataProvider?,
-        placeholder: Placeholder? = nil,
-        options: KingfisherOptionsInfo? = nil,
-        progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        return setSticker(
-            with: provider.map { .provider($0) },
-            placeholder: placeholder,
-            options: options,
-            progressBlock: progressBlock,
-            completionHandler: completionHandler)
-    }
-
-    /// Sets an image to the image view with a data provider.
-    ///
-    /// - Parameters:
-    ///   - provider: The `ImageDataProvider` object contains information about the data.
-    ///   - placeholder: A placeholder to show while retrieving the image from the given `resource`.
-    ///   - options: An options set to define image setting behaviors. See `KingfisherOptionsInfo` for more.
-    ///   - completionHandler: Called when the image retrieved and set finished.
-    /// - Returns: A task represents the image downloading.
-    ///
-    /// Internally, this method will use `KingfisherManager` to get the image data, from either cache
-    /// or the data provider. Since this method will perform UI changes, you must call it from the main thread.
-    /// The `completionHandler` will be also executed in the main thread.
-    ///
-    @discardableResult
-    func setSticker(
-        with provider: ImageDataProvider?,
-        placeholder: Placeholder? = nil,
-        options: KingfisherOptionsInfo? = nil,
-        completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        return setSticker(
-            with: provider,
-            placeholder: placeholder,
-            options: options,
-            progressBlock: nil,
-            completionHandler: completionHandler)
-    }
-
     internal func setSticker(
         with source: Source?,
-        placeholder: Placeholder? = nil,
         parsedOptions: KingfisherParsedOptionsInfo,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
@@ -270,13 +71,7 @@ public extension KingfisherWrapper where Base: MSStickerView {
             completionHandler: { result in
                 CallbackQueue.mainCurrentOrAsync.execute {
                     guard issuedIdentifier == self.taskIdentifier else {
-                        let reason: KingfisherError.ImageSettingErrorReason
-                        do {
-                            let value = try result.get()
-                            reason = .notCurrentSourceTask(result: nil, error: nil, source: source)
-                        } catch {
-                            reason = .notCurrentSourceTask(result: nil, error: error, source: source)
-                        }
+                        let reason: KingfisherError.ImageSettingErrorReason = .notCurrentSourceTask(result: nil, error: nil, source: source)
                         let error = KingfisherError.imageSettingError(reason: reason)
                         completionHandler?(.failure(error))
                         return
@@ -564,8 +359,6 @@ extension KingfisherManager {
         // 1. Check whether the image was already in target cache. If so, just get it.
         let targetCache = stickerCache
         let key = source.cacheKey
-        let targetImageCached = targetCache.imageCachedType(
-            forKey: key, processorIdentifier: options.processor.identifier)
 
         let url = stickerCache.diskStorage.cacheFileURL(forKey: key)
 
