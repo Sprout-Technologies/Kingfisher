@@ -96,7 +96,6 @@ public extension KingfisherWrapper where Base: MSStickerView {
             with: source,
             options: options,
             downloadTaskUpdated: { mutatingSelf.imageTask = $0 },
-            referenceTaskIdentifierChecker: { issuedIdentifier == self.taskIdentifier },
             completionHandler: { result in
                 CallbackQueue.mainCurrentOrAsync.execute {
                     guard issuedIdentifier == self.taskIdentifier else {
@@ -179,15 +178,9 @@ extension KingfisherManager {
         with source: Source,
         options: KingfisherParsedOptionsInfo,
         downloadTaskUpdated: DownloadTaskUpdatedBlock? = nil,
-        referenceTaskIdentifierChecker: (() -> Bool)? = nil,
         completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?) -> DownloadTask?
     {
         var options = options
-        if let checker = referenceTaskIdentifierChecker {
-            options.onDataReceived?.forEach {
-                $0.onShouldApply = checker
-            }
-        }
 
         let retrievingContext = RetrievingContext(options: options, originalSource: source)
         var retryContext: RetryContext?
@@ -291,12 +284,6 @@ extension KingfisherManager {
                 return nil
             }
 
-            if options.onlyFromCache {
-                let error = KingfisherError.cacheError(reason: .imageNotExisting(key: source.cacheKey))
-                completionHandler?(.failure(error))
-                return nil
-            }
-
             return loadAndCacheSticker(
                 source: source,
                 context: context,
@@ -321,6 +308,7 @@ extension KingfisherManager {
 
             // Add image to cache.
             let targetCache = stickerCache
+            targetCache.diskStorage.config.autoExtAfterHashedFileName = true
 
             do {
                 try targetCache.diskStorage.store(value: value.originalData, forKey: source.cacheKey)
@@ -392,9 +380,6 @@ extension KingfisherManager {
         context: RetrievingContext,
         completionHandler: ((Result<RetrieveStickerResult, KingfisherError>) -> Void)?) -> Bool
     {
-        let options = context.options
-        // 1. Check whether the image was already in target cache. If so, just get it.
-        let targetCache = stickerCache
         let key = source.cacheKey
 
         let url = stickerCache.diskStorage.cacheFileURL(forKey: key)
@@ -406,11 +391,10 @@ extension KingfisherManager {
 
             completionHandler?(.success(value))
 
+            return true
         } else {
-            completionHandler?(.failure(KingfisherError.cacheError(reason: .imageNotExisting(key: key))))
+            return false
         }
-
-        return true
     }
 }
 
