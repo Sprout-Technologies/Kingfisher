@@ -104,8 +104,6 @@ public extension KingfisherWrapper where Base: APNGImageView {
 
         var options = parsedOptions
 
-        let isEmptyImage = base.image == nil
-
         let issuedIdentifier = Source.Identifier.next()
         mutatingSelf.taskIdentifier = issuedIdentifier
 
@@ -201,7 +199,6 @@ extension KingfisherManager {
         referenceTaskIdentifierChecker: (() -> Bool)? = nil,
         completionHandler: ((Result<RetrieveAPNGResult, KingfisherError>) -> Void)?) -> DownloadTask?
     {
-        var options = options
         if let checker = referenceTaskIdentifierChecker {
             options.onDataReceived?.forEach {
                 $0.onShouldApply = checker
